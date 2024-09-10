@@ -2,6 +2,7 @@ package br.com.jelsonjr.controllers
 
 import br.com.jelsonjr.models.dtos.CreateUserDTO
 import br.com.jelsonjr.services.UserService
+import jakarta.validation.Valid
 import jakarta.ws.rs.*
 import jakarta.ws.rs.core.Context
 import jakarta.ws.rs.core.MediaType
@@ -38,7 +39,7 @@ class UserController(private val userService: UserService) {
     }
 
     @POST
-    fun registerUser(dto: CreateUserDTO): Response {
+    fun registerUser(@Valid dto: CreateUserDTO): Response {
         val userRegistered = userService.create(dto)
         val uri = uriInfo.absolutePathBuilder.path(userRegistered.id.toString()).build()
 

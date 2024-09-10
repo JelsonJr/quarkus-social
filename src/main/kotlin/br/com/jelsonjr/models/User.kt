@@ -1,12 +1,15 @@
 package br.com.jelsonjr.models
 
 import br.com.jelsonjr.models.dtos.CreateUserDTO
+import io.quarkus.mongodb.panache.common.MongoEntity
 import io.quarkus.mongodb.panache.kotlin.PanacheMongoEntity
+import org.mindrot.jbcrypt.BCrypt
 
+@MongoEntity(collection = "users")
 data class User(
-    var nome: String,
-    var email: String,
-    var password: String,
+    var nome: String = "",
+    var email: String = "",
+    var password: String = "",
     var phone: String? = ""
 ) : PanacheMongoEntity() {
     constructor(dto: CreateUserDTO) : this(

@@ -14,7 +14,7 @@ abstract class Service<Model : Any, CreateDTO>(
         page: Int? = null,
         size: Int? = null,
         sortField: String? = null,
-        sortDirection: String? = null
+        sortDirection: String? = null,
     ): PaginatedResponse<Model> {
         val defaultPage = page ?: 0
         val defaultSize = size ?: 100
@@ -31,6 +31,7 @@ abstract class Service<Model : Any, CreateDTO>(
         val pageResult = repository
             .findAll(sort)
             .page(pageable)
+        println(pageResult)
 
         return PaginatedResponse(
             totalElements = pageResult.count(),
