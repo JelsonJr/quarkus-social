@@ -2,6 +2,8 @@ package br.com.jelsonjr.controllers
 
 import br.com.jelsonjr.models.dtos.CreateUserDTO
 import br.com.jelsonjr.services.UserService
+import jakarta.annotation.security.PermitAll
+import jakarta.annotation.security.RolesAllowed
 import jakarta.validation.Valid
 import jakarta.ws.rs.*
 import jakarta.ws.rs.core.Context
@@ -19,6 +21,7 @@ class UserController(private val userService: UserService) {
     lateinit var uriInfo: UriInfo
 
     @GET
+    @RolesAllowed("USER")
     fun getUsers(
         @QueryParam("page") page: Int?,
         @QueryParam("size") size: Int?,
@@ -31,6 +34,7 @@ class UserController(private val userService: UserService) {
 
     @GET
     @Path("/{id}")
+    @RolesAllowed("USER")
     fun getUserById(@PathParam("id") id: String): Response {
         val objectId = ObjectId(id)
         val user = userService.getById(objectId)
@@ -39,10 +43,38 @@ class UserController(private val userService: UserService) {
     }
 
     @POST
+    @PermitAll
     fun registerUser(@Valid dto: CreateUserDTO): Response {
         val userRegistered = userService.create(dto)
         val uri = uriInfo.absolutePathBuilder.path(userRegistered.id.toString()).build()
 
         return Response.created(uri).entity(userRegistered).build()
+    }
+
+    @PATCH
+    @Path("/{idUser}/follow/{idToFollowing}")
+    @RolesAllowed("USER")
+    fun follow(@PathParam("idUser") idUser: String, @PathParam("idToFollowing") idToFollowing: String): Response {
+        userService.follow(idUser, idToFollowing)
+
+        return Response.noContent().build()
+    }
+
+    @PATCH
+    @Path("/{idUser}/unfollow/{idToUnfollowing}")
+    @RolesAllowed("USER")
+    fun unfollow(@PathParam("idUser") idUser: String, @PathParam("idToUnfollowing") idToUnfollowing: String): Response {
+        userService.unfollow(idUser, idToUnfollowing)
+
+        return Response.noContent().build()
+    }
+
+    @PATCH
+    @Path("/{idUser}/remove/follower/{idFollower}")
+    @RolesAllowed("USER")
+    fun removeFollower(@PathParam("idUser") idUser: String, @PathParam("idFollower") idFollower: String): Response {
+        userService.unfollow(idFollower, idUser)
+
+        return Response.noContent().build()
     }
 }

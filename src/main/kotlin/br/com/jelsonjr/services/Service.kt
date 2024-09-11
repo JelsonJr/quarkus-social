@@ -31,11 +31,12 @@ abstract class Service<Model : Any, CreateDTO>(
         val pageResult = repository
             .findAll(sort)
             .page(pageable)
-        println(pageResult)
+
 
         return PaginatedResponse(
             totalElements = pageResult.count(),
             totalPages = pageResult.pageCount(),
+            page = pageResult.page().index,
             elements = pageResult.list()
         )
     }
