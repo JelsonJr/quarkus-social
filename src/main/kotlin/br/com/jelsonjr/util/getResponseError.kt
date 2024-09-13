@@ -1,7 +1,13 @@
 package br.com.jelsonjr.util
 
+data class ResponseError(
+    val error: String,
+    val message: String,
+    val success: Boolean = false
+)
+
 fun getResponseErrorMap(error: String, message: String) =
-    mapOf("error" to formatErrorName(error), "message" to message, "success" to false)
+    ResponseError(formatErrorName(error),message)
 
 fun formatErrorName(error: String): String {
     var formattedError = error.replace("Exception", "")

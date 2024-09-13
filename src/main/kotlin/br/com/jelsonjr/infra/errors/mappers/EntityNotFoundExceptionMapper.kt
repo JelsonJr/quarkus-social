@@ -10,12 +10,12 @@ import jakarta.ws.rs.ext.Provider
 class EntityNotFoundExceptionMapper : ExceptionMapper<EntityNotFoundException> {
 
     override fun toResponse(exception: EntityNotFoundException): Response {
-        val errorResponse =
+        val responseError =
             getResponseErrorMap(exception.javaClass.simpleName, exception.message.toString())
 
         return Response
             .status(Response.Status.NOT_FOUND)
-            .entity(errorResponse)
+            .entity(responseError)
             .build()
     }
 }

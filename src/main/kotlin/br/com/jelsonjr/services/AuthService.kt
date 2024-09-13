@@ -1,10 +1,10 @@
 package br.com.jelsonjr.services
 
-import br.com.jelsonjr.infra.errors.exceptions.InvalidCredentialException
 import br.com.jelsonjr.infra.security.Credentials
 import br.com.jelsonjr.models.User
 import br.com.jelsonjr.repositorys.UserRepository
 import jakarta.enterprise.context.ApplicationScoped
+import jakarta.ws.rs.NotAuthorizedException
 
 @ApplicationScoped
 class AuthService(private val userRepository: UserRepository) {
@@ -15,7 +15,7 @@ class AuthService(private val userRepository: UserRepository) {
         return if (user != null && User.checkPassword(credentials.password, user.password)) {
             user
         } else {
-            throw InvalidCredentialException("Incorrect email or password")
+            throw NotAuthorizedException("Incorrect email or password")
         }
     }
 }
