@@ -26,6 +26,7 @@ class PostService(
     }
 
     fun getList(
+        idUser: ObjectId,
         sortField: String?,
         sortDirection: String?,
     ): List<Post> {
@@ -37,7 +38,7 @@ class PostService(
             else -> Sort.by(defaultSortField).ascending()
         }
 
-        return repository.findAll(sort).list()
+        return repository.find("user", sort, idUser).list()
     }
 
     override fun getById(id: ObjectId): Post {
