@@ -1,6 +1,6 @@
-package br.com.jelsonjr.controllers
+package br.com.jelsonjr.rest.resources
 
-import br.com.jelsonjr.models.dtos.CreateUserDTO
+import br.com.jelsonjr.rest.dtos.CreateUserDTO
 import br.com.jelsonjr.services.UserService
 import jakarta.annotation.security.PermitAll
 import jakarta.annotation.security.RolesAllowed
@@ -25,10 +25,12 @@ class UserController(private val userService: UserService) {
     fun getUsers(
         @QueryParam("page") page: Int?,
         @QueryParam("size") size: Int?,
-        @QueryParam("sortField") sortField: String?,
-        @QueryParam("sortDirection") sortDirection: String?,
+        @QueryParam("sortField") sortField: String? = "id",
+        @QueryParam("sortDirection") sortDirection: String? = "asc",
+        @QueryParam("filterField") filterField: String? = null,
+        @QueryParam("filterValue") filterValue: String? = null
     ): Response {
-        val users = userService.getAll(page, size, sortField, sortDirection)
+        val users = userService.getList(page, size, sortField, sortDirection, filterField, filterValue)
         return Response.ok(users).build()
     }
 

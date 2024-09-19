@@ -1,4 +1,4 @@
-package br.com.jelsonjr.controllers
+package br.com.jelsonjr.rest.resources
 
 import jakarta.annotation.security.PermitAll
 import jakarta.ws.rs.GET

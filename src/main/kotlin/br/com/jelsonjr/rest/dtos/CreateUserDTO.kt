@@ -1,4 +1,4 @@
-package br.com.jelsonjr.models.dtos
+package br.com.jelsonjr.rest.dtos
 
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank

@@ -1,4 +1,4 @@
-package br.com.jelsonjr.controllers
+package br.com.jelsonjr.rest.resources
 
 import br.com.jelsonjr.infra.security.Credentials
 import br.com.jelsonjr.infra.security.JwtUtils

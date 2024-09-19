@@ -1,39 +1,28 @@
 package br.com.jelsonjr.models
 
-import br.com.jelsonjr.models.dtos.CreateUserDTO
 import io.quarkus.mongodb.panache.common.MongoEntity
-import org.bson.types.ObjectId
 import io.quarkus.mongodb.panache.kotlin.PanacheMongoEntity
+import org.bson.types.ObjectId
 import org.mindrot.jbcrypt.BCrypt
 
 @MongoEntity(collection = "users")
 data class User(
-    var nome: String = "",
+    var name: String = "",
     var email: String = "",
     var password: String = "",
     var phone: String? = "",
     var followers: MutableList<ObjectId> = mutableListOf(),
     var following: MutableList<ObjectId> = mutableListOf(),
+    var posts: MutableList<Post> = mutableListOf()
 ) : PanacheMongoEntity() {
 
-    constructor(dto: CreateUserDTO) : this(
-        dto.name,
-        dto.email,
-        hashPassword(dto.password),
-        dto.phone,
-        mutableListOf(),
-        mutableListOf()
-    )
-
-    private fun addFollower(userId: ObjectId) {
-        if (userId !in followers) {
-            followers.add(userId)
+    companion object {
+        fun hashPassword(password: String): String {
+            return BCrypt.hashpw(password, BCrypt.gensalt())
         }
-    }
 
-    private fun removeFollower(followerId: ObjectId) {
-        if (followerId in followers) {
-            followers.remove(followerId)
+        fun checkPassword(password: String, hashed: String): Boolean {
+            return BCrypt.checkpw(password, hashed)
         }
     }
 
@@ -51,13 +40,15 @@ data class User(
         }
     }
 
-    companion object {
-        private fun hashPassword(password: String): String {
-            return BCrypt.hashpw(password, BCrypt.gensalt())
+    private fun addFollower(userId: ObjectId) {
+        if (userId !in followers) {
+            followers.add(userId)
         }
+    }
 
-        fun checkPassword(password: String, hashed: String): Boolean {
-            return BCrypt.checkpw(password, hashed)
+    private fun removeFollower(followerId: ObjectId) {
+        if (followerId in followers) {
+            followers.remove(followerId)
         }
     }
 
