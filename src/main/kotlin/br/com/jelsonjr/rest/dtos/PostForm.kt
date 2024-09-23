@@ -1,13 +1,12 @@
 package br.com.jelsonjr.rest.dtos
 
-import br.com.jelsonjr.models.User
 import br.com.jelsonjr.models.enums.PostType
 import org.jboss.resteasy.reactive.RestForm
 import org.jboss.resteasy.reactive.multipart.FileUpload
 
 class PostForm {
     @RestForm
-    lateinit var user: User
+    lateinit var idUser: String
 
     @RestForm
     lateinit var text: String

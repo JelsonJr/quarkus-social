@@ -15,11 +15,11 @@ class PostService(
 ) : Service<Post, PostForm> {
 
     override fun create(dto: PostForm): Post {
-        val post = dto.toPost()
+        val user = userRepository.findByIdOrThrow(ObjectId(dto.idUser))
+        val post = dto.toPost(user)
         post.fileUrl = dto.file?.fileName()
         repository.persist(post)
 
-        val user = userRepository.findByIdOrThrow(post.user.id!!)
         user.posts.add(post)
 
         return post

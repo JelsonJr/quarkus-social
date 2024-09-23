@@ -10,7 +10,8 @@ import jakarta.ws.rs.ext.Provider
 class NotAuthorizedExceptionMapper : ExceptionMapper<NotAuthorizedException> {
 
     override fun toResponse(exception: NotAuthorizedException): Response {
-        val response = getResponseErrorMap(exception.javaClass.simpleName, exception.message.toString())
+        val message = exception.message ?: "Unauthorized access"
+        val response = getResponseErrorMap(exception.javaClass.simpleName, message)
 
         return Response
             .status(Response.Status.UNAUTHORIZED)
