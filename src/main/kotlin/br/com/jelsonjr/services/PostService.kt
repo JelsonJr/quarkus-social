@@ -8,6 +8,11 @@ import br.com.jelsonjr.rest.dtos.PostForm
 import io.quarkus.panache.common.Sort
 import jakarta.enterprise.context.ApplicationScoped
 import org.bson.types.ObjectId
+import java.io.InputStream
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.nio.file.StandardCopyOption
+import kotlin.io.path.inputStream
 
 @ApplicationScoped
 class PostService(
@@ -16,11 +21,17 @@ class PostService(
 
     override fun create(dto: PostForm): Post {
         val user = userRepository.findByIdOrThrow(ObjectId(dto.idUser))
-        val post = dto.toPost(user)
-        post.fileUrl = dto.file?.fileName()
-        repository.persist(post)
+        val post = dto.toPost()
+
+        dto.file?.let {
+            val fileName = it.fileName()
+            post.fileUrl = saveFile(it.uploadedFile().inputStream(), fileName)
+        }
 
         user.posts.add(post)
+
+        repository.persist(post)
+        userRepository.update(user)
 
         return post
     }
@@ -47,5 +58,25 @@ class PostService(
 
     override fun delete(id: ObjectId): Boolean {
         return repository.deleteById(id)
+    }
+
+    fun likePost(id: String) {
+        val post = repository.findByIdOrThrow(ObjectId(id))
+        post.likes++
+
+        repository.persist(post)
+    }
+
+    private fun saveFile(file: InputStream, fileName: String): String {
+        val uploadDir = Paths.get("upload")
+
+        if (!Files.exists(uploadDir)) {
+            Files.createDirectories(uploadDir)
+        }
+
+        val filePath = uploadDir.resolve(fileName)
+        Files.copy(file, filePath, StandardCopyOption.REPLACE_EXISTING)
+
+        return filePath.toString()
     }
 }

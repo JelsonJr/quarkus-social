@@ -40,4 +40,12 @@ class PostController(private val service: PostService) {
 
         return Response.ok().entity(posts).build()
     }
+
+    @PATCH
+    @Path("/like/{id}")
+    @RolesAllowed("USER")
+    fun likePost(@PathParam("id") id: String) : Response {
+        service.likePost(id)
+        return Response.ok().build()
+    }
 }
