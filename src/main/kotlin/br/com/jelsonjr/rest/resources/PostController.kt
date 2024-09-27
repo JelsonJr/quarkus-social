@@ -57,4 +57,12 @@ class PostController(private val service: PostService) {
         service.dislikePost(id)
         return Response.ok().build()
     }
+
+    @DELETE
+    @Path("/{id}")
+    @RolesAllowed("USER")
+    fun deletePost(@PathParam("id") id: String): Response {
+        service.delete(service.removeFile(ObjectId(id)))
+        return Response.noContent().build()
+    }
 }
