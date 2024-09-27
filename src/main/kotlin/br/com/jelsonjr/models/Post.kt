@@ -8,15 +8,14 @@ import java.time.LocalDateTime
 
 @MongoEntity(collection = "posts")
 data class Post(
-    val user: ObjectId = ObjectId(),
-    val postType: PostType = PostType.TEXT,
-    val text: String = "",
+    var user: ObjectId? = null,
+    var postType: PostType? = null,
+    var text: String = "",
     var likes: Int = 0,
     var shares: Int = 0,
-    val comments: List<Comment> = emptyList(),
+    var comments: List<Comment> = emptyList(),
     var fileUrl: String? = null,
-    val tags: List<String> = emptyList(),
-    val creationDate: LocalDateTime = LocalDateTime.now(),
-    val location: String? = null
+    var tags: List<String> = emptyList(),
+    var creationDate: LocalDateTime = LocalDateTime.now(),
+    var location: String? = null
 ) : PanacheMongoEntity()
-

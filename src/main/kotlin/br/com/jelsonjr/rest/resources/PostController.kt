@@ -35,8 +35,9 @@ class PostController(private val service: PostService) {
         @PathParam("idUser") idUser: String,
         @QueryParam("sortField") sortField: String? = "id",
         @QueryParam("sortDirection") sortDirection: String? = "asc",
+        @QueryParam("page") page: Int? = 0
     ): Response {
-        val posts = service.getList(ObjectId(idUser), sortField, sortDirection)
+        val posts = service.getList(ObjectId(idUser), page, sortField, sortDirection)
 
         return Response.ok().entity(posts).build()
     }
@@ -44,8 +45,16 @@ class PostController(private val service: PostService) {
     @PATCH
     @Path("/like/{id}")
     @RolesAllowed("USER")
-    fun likePost(@PathParam("id") id: String) : Response {
+    fun likePost(@PathParam("id") id: String): Response {
         service.likePost(id)
+        return Response.ok().build()
+    }
+
+    @PATCH
+    @Path("/dislike/{id}")
+    @RolesAllowed("USER")
+    fun dislikePost(@PathParam("id") id: String): Response {
+        service.dislikePost(id)
         return Response.ok().build()
     }
 }

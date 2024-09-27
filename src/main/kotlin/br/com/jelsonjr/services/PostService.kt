@@ -5,6 +5,8 @@ import br.com.jelsonjr.models.Post
 import br.com.jelsonjr.repositorys.PostRepository
 import br.com.jelsonjr.repositorys.UserRepository
 import br.com.jelsonjr.rest.dtos.PostForm
+import br.com.jelsonjr.types.PaginatedResponse
+import io.quarkus.panache.common.Page
 import io.quarkus.panache.common.Sort
 import jakarta.enterprise.context.ApplicationScoped
 import org.bson.types.ObjectId
@@ -38,9 +40,10 @@ class PostService(
 
     fun getList(
         idUser: ObjectId,
+        page: Int?,
         sortField: String?,
         sortDirection: String?,
-    ): List<Post> {
+    ): PaginatedResponse<Post> {
         val defaultSortField = sortField ?: "id"
         val defaultSortDirection = sortDirection ?: "desc"
 
@@ -49,7 +52,14 @@ class PostService(
             else -> Sort.by(defaultSortField).ascending()
         }
 
-        return repository.find("user", sort, idUser).list()
+        val pageResult = repository.find("user", sort, idUser).page(Page.of(0, 30))
+
+        return PaginatedResponse(
+            totalElements = pageResult.count(),
+            totalPages = pageResult.pageCount(),
+            page = pageResult.page().index,
+            elements = pageResult.list()
+        )
     }
 
     override fun getById(id: ObjectId): Post {
@@ -64,7 +74,14 @@ class PostService(
         val post = repository.findByIdOrThrow(ObjectId(id))
         post.likes++
 
-        repository.persist(post)
+        repository.update(post)
+    }
+
+    fun dislikePost(id: String) {
+        val post = repository.findByIdOrThrow(ObjectId(id))
+        post.likes--
+
+        repository.update(post)
     }
 
     private fun saveFile(file: InputStream, fileName: String): String {

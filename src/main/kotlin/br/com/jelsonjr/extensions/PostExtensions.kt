@@ -1,7 +1,6 @@
 package br.com.jelsonjr.extensions
 
 import br.com.jelsonjr.models.Post
-import br.com.jelsonjr.models.User
 import br.com.jelsonjr.rest.dtos.PostForm
 import org.bson.types.ObjectId
 
