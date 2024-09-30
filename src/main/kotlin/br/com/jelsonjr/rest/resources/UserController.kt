@@ -38,10 +38,34 @@ class UserController(private val userService: UserService) {
     @Path("/{id}")
     @RolesAllowed("USER")
     fun getUserById(@PathParam("id") id: String): Response {
-        val objectId = ObjectId(id)
-        val user = userService.getById(objectId)
+        val user = userService.getById(ObjectId(id))
 
         return Response.ok(user).build()
+    }
+
+    @GET
+    @Path("/{id}/followers")
+    @RolesAllowed("USER")
+    fun getFollowersByUser(
+        @PathParam("id") id: String,
+        @QueryParam("page") page: Int? = 0,
+        @QueryParam("size") size: Int? = 10,
+        @QueryParam("sortField") sortField: String? = "id",
+        @QueryParam("sortDirection") sortDirection: String? = "asc",
+        @QueryParam("filterField") filterField: String? = null,
+        @QueryParam("filterValue") filterValue: String? = null
+    ): Response {
+        val followers = userService.getFollowers(
+            ObjectId(id),
+            page ?: 0,
+            size ?: 10,
+            sortField ?: "id",
+            sortDirection ?: "asc",
+            filterField,
+            filterValue
+        )
+
+        return Response.ok(followers).build()
     }
 
     @POST

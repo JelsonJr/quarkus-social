@@ -62,7 +62,7 @@ class PostController(private val service: PostService) {
     @Path("/{id}")
     @RolesAllowed("USER")
     fun deletePost(@PathParam("id") id: String): Response {
-        service.delete(service.removeFile(ObjectId(id)))
+        service.delete(ObjectId(id))
         return Response.noContent().build()
     }
 }

@@ -5,9 +5,12 @@ import br.com.jelsonjr.models.User
 import br.com.jelsonjr.rest.dtos.CreateUserDTO
 import br.com.jelsonjr.repositorys.UserRepository
 import br.com.jelsonjr.types.PaginatedResponse
+import com.mongodb.client.model.Filters
+import com.mongodb.client.model.Sorts
 import io.quarkus.panache.common.Page
 import io.quarkus.panache.common.Sort
 import jakarta.enterprise.context.ApplicationScoped
+import org.bson.conversions.Bson
 import org.bson.types.ObjectId
 
 @ApplicationScoped
@@ -39,9 +42,11 @@ class UserService(private val repository: UserRepository) : Service<User, Create
             else -> Sort.by(defaultSortField).ascending()
         }
 
-        val pageResult = if (filterField != null) {
-            repository
-                .find(filterField, filterValue).page(pageable)
+        val pageResult = if (filterField != null && filterValue != null) {
+            repository.find(
+                "{'$filterField': {'\$regex': ?1, '\$options': 'i'}}",
+                filterValue
+            ).page(pageable)
         } else {
             repository
                 .findAll(sort)
@@ -62,6 +67,46 @@ class UserService(private val repository: UserRepository) : Service<User, Create
 
     override fun delete(id: ObjectId): Boolean {
         return repository.deleteById(id)
+    }
+
+    fun getFollowers(
+        objectId: ObjectId,
+        page: Int = 0,
+        size: Int = 10,
+        sortField: String = "id",
+        sortDirection: String = "asc",
+        filterField: String? = null,
+        filterValue: String? = null
+    ): PaginatedResponse<User> {
+        val user = repository.findByIdOrThrow(objectId)
+        val followersIds = user.followers
+        val filters = mutableListOf<Bson>(Filters.`in`("_id", followersIds))
+
+        if (filterField != null && filterValue != null) {
+            filters.add(Filters.regex(filterField, filterValue, "i"))
+        }
+
+        val sort = if (sortDirection == "asc") {
+            Sorts.ascending(sortField)
+        } else {
+            Sorts.descending(sortField)
+        }
+
+        val query = repository.mongoCollection().find(Filters.and(filters))
+            .sort(sort)
+            .skip(page * size)
+            .limit(size)
+
+        val totalElements = repository.mongoCollection().countDocuments(Filters.and(filters))
+        val users = query.toList()
+        val totalPages = (totalElements / size).toInt() + if (totalElements % size > 0) 1 else 0
+
+        return PaginatedResponse(
+            totalElements = totalElements,
+            totalPages = totalPages,
+            page = page,
+            elements = users
+        )
     }
 
     fun follow(idUser: String, idToFollowing: String) {

@@ -67,6 +67,8 @@ class PostService(
     }
 
     override fun delete(id: ObjectId): Boolean {
+        removeFile(repository.findByIdOrThrow(id))
+
         return repository.deleteById(id)
     }
 
@@ -84,16 +86,13 @@ class PostService(
         repository.update(post)
     }
 
-    fun removeFile(id: ObjectId): ObjectId {
-        val post = repository.findByIdOrThrow(id)
+    private fun removeFile(post: Post) {
         val fileUrl = post.fileUrl
 
         if (fileUrl != null) {
             val path = Paths.get(fileUrl)
             Files.deleteIfExists(path)
         }
-
-        return post.id!!
     }
 
     private fun saveFile(file: InputStream, fileName: String): String {
