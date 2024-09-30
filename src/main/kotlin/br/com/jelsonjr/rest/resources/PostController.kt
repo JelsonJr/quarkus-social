@@ -13,10 +13,10 @@ import org.bson.types.ObjectId
 @Path("/posts")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-class PostController(private val service: PostService) {
-
-    @Context
-    lateinit var uriInfo: UriInfo
+class PostController(
+    @Context val uriInfo: UriInfo,
+    private val service: PostService,
+) {
 
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)

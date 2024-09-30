@@ -14,11 +14,11 @@ import java.util.Base64
 @ApplicationScoped
 class JwtUtils(private val jwtConfig: JwtConfig) {
 
-    fun generateToken(username: String, roles: Set<String>): String {
+    fun generateToken(email: String, roles: Set<String>): String {
         try {
             val claimsBuilder: JwtClaimsBuilder = Jwt.claims()
                 .expiresIn(Duration.ofDays(365))
-                .subject(username)
+                .subject(email)
                 .issuer(jwtConfig.issuer())
                 .groups(roles)
 

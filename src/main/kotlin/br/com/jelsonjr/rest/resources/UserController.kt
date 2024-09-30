@@ -68,6 +68,31 @@ class UserController(private val userService: UserService) {
         return Response.ok(followers).build()
     }
 
+    @GET
+    @Path("/{id}/following")
+    @RolesAllowed("USER")
+    fun getFollowingByUser(
+        @PathParam("id") id: String,
+        @QueryParam("page") page: Int? = 0,
+        @QueryParam("size") size: Int? = 10,
+        @QueryParam("sortField") sortField: String? = "id",
+        @QueryParam("sortDirection") sortDirection: String? = "asc",
+        @QueryParam("filterField") filterField: String? = null,
+        @QueryParam("filterValue") filterValue: String? = null
+    ): Response {
+        val followers = userService.getFollowing(
+            ObjectId(id),
+            page ?: 0,
+            size ?: 10,
+            sortField ?: "id",
+            sortDirection ?: "asc",
+            filterField,
+            filterValue
+        )
+
+        return Response.ok(followers).build()
+    }
+
     @POST
     @PermitAll
     fun registerUser(@Valid dto: CreateUserDTO): Response {

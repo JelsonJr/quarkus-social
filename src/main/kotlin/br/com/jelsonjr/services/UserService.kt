@@ -128,4 +128,44 @@ class UserService(private val repository: UserRepository) : Service<User, Create
         repository.update(user)
         repository.update(userToUnfollowing)
     }
+
+    fun getFollowing(
+        objectId: ObjectId,
+        page: Int = 0,
+        size: Int = 10,
+        sortField: String = "id",
+        sortDirection: String = "asc",
+        filterField: String? = null,
+        filterValue: String? = null
+    ): Any? {
+        val user = repository.findByIdOrThrow(objectId)
+        val followersIds = user.following
+        val filters = mutableListOf<Bson>(Filters.`in`("_id", followersIds))
+
+        if (filterField != null && filterValue != null) {
+            filters.add(Filters.regex(filterField, filterValue, "i"))
+        }
+
+        val sort = if (sortDirection == "asc") {
+            Sorts.ascending(sortField)
+        } else {
+            Sorts.descending(sortField)
+        }
+
+        val query = repository.mongoCollection().find(Filters.and(filters))
+            .sort(sort)
+            .skip(page * size)
+            .limit(size)
+
+        val totalElements = repository.mongoCollection().countDocuments(Filters.and(filters))
+        val users = query.toList()
+        val totalPages = (totalElements / size).toInt() + if (totalElements % size > 0) 1 else 0
+
+        return PaginatedResponse(
+            totalElements = totalElements,
+            totalPages = totalPages,
+            page = page,
+            elements = users
+        )
+    }
 }
